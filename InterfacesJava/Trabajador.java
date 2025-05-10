@@ -1,4 +1,0 @@
-interface Trabajador {
-
-    double pagar();
-}
