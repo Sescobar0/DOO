@@ -1,139 +1,35 @@
 const person = require('../models/person');
 
-let users = [
-    { id: 1, nombre: "Geremias", apellido: "Beltran" },
-    { id: 2, nombre: "Isadora", apellido: "Montiel" },
-    { id: 3, nombre: "Laureano", apellido: "Gómez" },
-    { id: 4, nombre: "Carlos", apellido: "Castro" }
-]
-
 class ServerController {
+
     constructor() {
-
     }
 
-    register(req, res) {
-        person.create(req.body, (error, data) => {
-            if (error) {
-                res.status(500).send();
-            } else {
-                res.status(201).json(data);
-            }
-        });
-    }
-
-    /* register(req, res) {
-        //obtener datos
-        let { id, nombre, apellido } = req.body;
-        console.log("Usuario registrado con éxito");
-        console.table({ id, nombre, apellido });
-        users.push(req.body);
-        res.status(200).json({
-            message: "Usuario registrado con éxito"
-        });
-    } */
-
-    /*    update(req, res) {
-            let { id, nombre, apellido } = req.body;
-            console.table({ id, nombre, apellido });
-    
-            users.forEach(element => {
-                if (id == element.id) {
-                    element.nombre = nombre;
-                    element.apellido = apellido;
-                }
-            });
-    
-            if (users != null) {
-                res.status(200).json(users);
-            } else {
-                res.status(400).json({ message: "Usuario no encontrado" });
-            }
-        }*/
-
-    update(req, res) {
-        let { id, nombre, apellido, edad, email } = req.body;
-        let obj = { nombre, apellido, edad, email }
-        person.findByIdAndUpdate(id, { $set: obj }, (error, data) => {
-            if (error) {
-                res.status(500).send();
-            } else {
-                res.status(200).json(data);
-            }
-        })
-    }
-
-
-    /*deleteUser(req, res) {
-        let { id } = req.body;
-        console.table({ id });
-
-        let tempUser = [];
-        users.forEach(element => {
-            if (id != element.id) {
-                tempUser.push(element);
-            }
-        });
-
-        users = tempUser;
-        if (users != null) {
-            res.status(200).json(users);
-        } else {
-            res.status(400).json({ message: "Usuario no encontrado" });
+    //Obtiene todos los registros de la colección de la base de datos NoSQL
+    async getAllUsers(req, res) {
+        try {
+            const data = await person.find({}); // El objeto vacío {} indica que queremos todos los documentos
+            res.status(200).json(data);
+        } catch (error) {
+            console.error("Error al obtener los usuarios:", error);
+            res.status(500).send();
         }
-    }*/
-
-    deleteUser(req, res) {
-        let { id } = req.body;
-        person.findByIdAndDelete(id, (error, data) => {
-            if (error) {
-                res.status(500).send();
-            } else {
-                res.status(200).json(data);
-            }
-        })
     }
+    //Obtiene el registro según el id que le estemos pasando a la colección de la base de datos NoSQL
+    async getUsers(req, res) {
+        try {
+            const id = req.params.id;
+            const data = await person.findById(id);
 
-
-    /*    getUsers(req, res) {
-            let id = req.params.id;
-            let userResp = null;
-            users.forEach(element => {
-                if (id == element.id) {
-                    userResp = element;
-                }
-            });
-    
-            if (userResp != null) {
-                res.status(200).json(userResp);
-            } else {
-                res.status(400).json({ message: "Usuario no encontrado" });
-            }
-        }*/
-
-    getUsers(req, res) {
-        let id = req.params.id;
-        person.findById(id, (error, data) => {
-            if (error) {
-                res.status(500).send();
-            } else {
+            if (data) {
                 res.status(200).json(data);
-            }
-        })
-    }
-
-    /*    getAllUsers(req, res) {
-            res.status(200).json(users);
-        }*/
-
-    getAllUsers(req, res) {
-        person.find((error, data) => {
-            if (error) {
-                res.status(500).send();
             } else {
-                res.status(200).json(data);
+                res.status(404).send(); // Si no se encuentra el usuario, devolvemos un 404
             }
-        })
+        } catch (error) {
+            console.error(`Error al obtener el usuario con ID ${req.params.id}:`, error);
+            res.status(500).send();
+        }
     }
 
 }
