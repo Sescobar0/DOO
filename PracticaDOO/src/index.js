@@ -2,6 +2,8 @@
 //Importar express
 const express = require('express');
 const serverRouter = require('./routers/serverRouter');
+const app = express();
+const path = require('path');
 //Importar mongoose
 const mongoose = require('mongoose');
 //Importar url de conexión a la BD
